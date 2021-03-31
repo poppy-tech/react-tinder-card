@@ -72,7 +72,15 @@ const animateBack = (element) => {
   }, settings.snapBackDuration)
 }
 
-const getSwipeDirection = (speed) => {
+const getSwipeDirection = (speed, lastLocation, configs) => {
+  if (configs && lastLocation.x > configs.rightLocationThreshold) {
+    return 'right'
+  }
+
+  if (configs && lastLocation.x < configs.leftLocationThreshold) {
+    return 'left'
+  }
+
   if (Math.abs(speed.x) > Math.abs(speed.y)) {
     return (speed.x > 0) ? 'right' : 'left'
   } else {
@@ -130,7 +138,7 @@ const mouseCoordinatesFromEvent = (e) => {
   return { x: e.clientX, y: e.clientY }
 }
 
-const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, onSwipe, onCardLeftScreen, className, preventSwipe = [] }, ref) => {
+const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, configs, onSwipe, onCardLeftScreen, className, preventSwipe = [] }, ref) => {
   const swipeAlreadyReleased = React.useRef(false)
 
   const element = React.useRef()
@@ -154,14 +162,19 @@ const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, onSwipe, o
     }
   }))
 
-  const handleSwipeReleased = React.useCallback(async (element, speed) => {
+  const handleSwipeReleased = React.useCallback(async (element, speed, lastLocation) => {
     if (swipeAlreadyReleased.current) { return }
     swipeAlreadyReleased.current = true
 
     // Check if this is a swipe
-    if (Math.abs(speed.x) > settings.swipeThreshold || Math.abs(speed.y) > settings.swipeThreshold) {
-      const dir = getSwipeDirection(speed)
+    let checkMore = false
 
+    if (configs) {
+      checkMore = lastLocation.x > configs.rightLocationThreshold || lastLocation.x < configs.leftLocationThreshold
+    }
+
+    if (Math.abs(speed.x) > settings.swipeThreshold || Math.abs(speed.y) > settings.swipeThreshold || checkMore) {
+      const dir = getSwipeDirection(speed, lastLocation, configs)
       if (onSwipe) onSwipe(dir)
 
       if (flickOnSwipe) {
@@ -219,14 +232,14 @@ const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, onSwipe, o
 
     element.current.addEventListener(('touchend'), (ev) => {
       ev.preventDefault()
-      handleSwipeReleased(element.current, speed)
+      handleSwipeReleased(element.current, speed, lastLocation)
     })
 
     element.current.addEventListener(('mouseup'), (ev) => {
       if (mouseIsClicked) {
         ev.preventDefault()
         mouseIsClicked = false
-        handleSwipeReleased(element.current, speed)
+        handleSwipeReleased(element.current, speed, lastLocation)
       }
     })
 
@@ -234,7 +247,7 @@ const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, onSwipe, o
       if (mouseIsClicked) {
         ev.preventDefault()
         mouseIsClicked = false
-        handleSwipeReleased(element.current, speed)
+        handleSwipeReleased(element.current, speed, lastLocation)
       }
     })
   }, [])
