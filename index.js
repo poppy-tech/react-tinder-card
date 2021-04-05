@@ -167,13 +167,13 @@ const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, configs, o
     swipeAlreadyReleased.current = true
 
     // Check if this is a swipe
-    let checkMore = false
+    let swipeDistanceThresholdMet  = false
 
     if (configs) {
-      checkMore = lastLocation.x > configs.rightLocationThreshold || lastLocation.x < configs.leftLocationThreshold
+      swipeDistanceThresholdMet  = lastLocation.x > configs.rightLocationThreshold || lastLocation.x < configs.leftLocationThreshold
     }
 
-    if (Math.abs(speed.x) > settings.swipeThreshold || Math.abs(speed.y) > settings.swipeThreshold || checkMore) {
+    if (Math.abs(speed.x) > settings.swipeThreshold || Math.abs(speed.y) > settings.swipeThreshold || swipeDistanceThresholdMet) {
       const dir = getSwipeDirection(speed, lastLocation, configs)
       if (onSwipe) onSwipe(dir)
 
