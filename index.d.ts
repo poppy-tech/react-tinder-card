@@ -3,6 +3,10 @@ import React from 'react'
 declare type Direction = 'left' | 'right' | 'up' | 'down'
 declare type SwipeHandler = (direction: Direction) => void
 declare type CardLeftScreenHandler = (direction: Direction) => void
+declare interface SwipeConfigs {
+  rightLocationThreshold: number
+  leftLocationThreshold: number
+}
 
 declare interface API {
   /**
@@ -39,6 +43,14 @@ declare interface Props {
    * @default []
    */
   preventSwipe?: string[]
+
+  /**
+   * The configuration relating to swipe
+   * 
+   * @property {leftLocationThreshold} number Distance threshold on the left. ex: -400
+   * @property {rightLocationThreshold} number Distance threshold on the right. ex: 400
+   */
+   configs?: SwipeConfigs
 }
 
 declare const TinderCard: React.FC<Props>
