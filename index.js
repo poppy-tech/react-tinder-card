@@ -170,7 +170,17 @@ const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, configs, o
     let swipeDistanceThresholdMet  = false
 
     if (configs) {
-      swipeDistanceThresholdMet  = lastLocation.x > configs.rightLocationThreshold || lastLocation.x < configs.leftLocationThreshold
+      const leftDistanceThresholdMet = lastLocation.x < configs.leftLocationThreshold
+      const rightDistanceThresholdMet = lastLocation.x > configs.rightLocationThreshold
+
+      if (leftDistanceThresholdMet || rightDistanceThresholdMet) {
+        const power = leftDistanceThresholdMet ? -1000 : 1000
+        const disturbance = (Math.random() - 0.5) * 100
+
+        speed = { x: power, y: disturbance }
+      }
+
+      swipeDistanceThresholdMet  = rightDistanceThresholdMet || leftDistanceThresholdMet
     }
 
     if (Math.abs(speed.x) > settings.swipeThreshold || Math.abs(speed.y) > settings.swipeThreshold || swipeDistanceThresholdMet) {
