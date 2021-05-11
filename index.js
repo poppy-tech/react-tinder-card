@@ -157,7 +157,10 @@ const TinderCard = React.forwardRef(({ flickOnSwipe = true, children, configs, o
       } else if (dir === 'down') {
         await animateOut(element.current, { x: disturbance, y: -power }, true)
       }
-      element.current.style.display = 'none'
+
+      if (element.current) {
+        element.current.style.display = 'none'
+      }
       if (onCardLeftScreen) onCardLeftScreen(dir)
     }
   }))
